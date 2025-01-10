@@ -6,7 +6,7 @@
 mongoc_client_t *client;
 
 void on_ok_button_clicked(GtkWidget *widget, gpointer data);
-void show_message_box(GtkWidget *parent, const gchar *command);
+gchar* show_message_box(GtkWidget *parent, const gchar *command);
 int database_handle(gchar* database_name, gchar* collection_name, bson_t *doc);
 void create_dynamic_short_video(const char *input_file, int num_segments, int segment_duration, int total_duration);
 void on_parse_button_clicked(GtkWidget *widget, gpointer data);
@@ -93,11 +93,12 @@ BSON_APPEND_INT32(doc, "duration", 240);
     create_dynamic_short_video(input_file, num_segments, segment_duration, total_duration);
 }
 
-void show_message_box(GtkWidget *parent, const gchar *command) {
+// Correct
+gchar* show_message_box(GtkWidget *parent, const gchar *command) {
     FILE *fp = popen(command, "r");
     if (fp == NULL) {
         g_print("Failed to run command\n");
-        return;
+        return "Failed to run command\n";
     }
     GString *output = g_string_new(NULL);
     char buffer[128];
@@ -110,12 +111,14 @@ void show_message_box(GtkWidget *parent, const gchar *command) {
                                                GTK_MESSAGE_INFO,
                                                GTK_BUTTONS_OK,
                                                "%s", output->str);
+
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 
-    g_string_free(output, TRUE);
+    return output->str;
 }
 
+// Correct
 int database_handle(gchar* database_name, gchar* collection_name, bson_t *doc) {
     mongoc_collection_t *collection;
     bson_error_t error;
@@ -183,58 +186,67 @@ void create_dynamic_short_video(const char *input_file, int num_segments, int se
     free(start_times);
 }
 
+GtkWidget* fetch_grid_elements(GtkWidget *widget, gpointer data) {
+    if (GTK_IS_CONTAINER(widget)) {
+        GList *children = gtk_container_get_children(GTK_CONTAINER(widget));
+        for (GList *iter = children; iter != NULL; iter = g_list_next(iter)) {
+            GtkWidget *result = fetch_grid_elements(GTK_WIDGET(iter->data), data);
+            if (result != NULL) {
+                g_list_free(children);
+                return result;
+            }
+        }
+        g_list_free(children);
+    }
 
-void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
-    GtkWidget *window = (GtkWidget *)data;
-    GList *children = gtk_container_get_children(GTK_CONTAINER(window));
+    const gchar *name = (const gchar *)data;
 
-    while ((children = g_list_next(children)) != NULL) {
-                            GtkWidget* widget = find_child(children->data, "youtube_link_entry");
-                            if (widget != NULL) {
-                                    const gchar *input_text = gtk_entry_get_text(GTK_ENTRY(widget));
-    g_print("Input Box Value: %s\n", input_text);
-                            }
-                    }
+    if (g_strcmp0(gtk_widget_get_name(widget), name) == 0) {
+        return widget;
+    }
 
-
-
-
-    // GtkWidget *input_box = gtk_widget_get_child(window, "youtube_link_entry");
-    //const gchar *input_text = gtk_entry_get_text(GTK_ENTRY(input_box));
-    //g_print("Input Box Value: %s\n", input_text);
-
-// Ensure the youtube_link entry is valid
-    // if (cb_data->youtube_link) {
-    //     //g_print(gtk_entry_get_text(GTK_ENTRY(cb_data->youtube_link)));
-    //     return; 
-    // }
-
-
-    // gtk_entry_get_text(GTK_ENTRY(youtube_link_entry)
-    
-// const gchar *youtube_link_text = gtk_entry_get_text(GTK_ENTRY(cb_data->youtube_link)); 
-// show_message_box(gtk_widget_get_toplevel(widget), youtube_link_text);
-
-    // show_message_box(gtk_widget_get_toplevel(widget), gtk_entry_get_text(GTK_ENTRY(cb_data->youtube_link)));
-    //const gchar *youtube_link = gtk_entry_get_text(GTK_ENTRY(cb_data->youtube_link));
-
-// ./yt-dlp --print "title: %(title)s\nid: %(id)s\nartist: %(uploader)s\nthumbnail: %(thumbnail)s" https://www.youtube.com/watch?v=bB3-CUMERIU
-
-    // gchar command[256];
-    // snprintf(command, sizeof(command), "./yt-dlp --print \"title: %(title)s\nid: %(id)s\nartist: %(uploader)s\nthumbnail: %(thumbnail)s\" %s", cb_data->youtube_link);
-
-    // show_message_box(gtk_widget_get_toplevel(widget), command);
-
-    // GtkEntry *song_entry = GTK_ENTRY(g_object_get_data(G_OBJECT(widget), "song_entry"));
-    // GtkEntry *artist_entry = GTK_ENTRY(g_object_get_data(G_OBJECT(widget), "artist_entry"));
-    // GtkEntry *uid_entry = GTK_ENTRY(g_object_get_data(G_OBJECT(widget), "uid_entry"));
-
-    // gtk_entry_set_text(song_entry, cb_data->title ? cb_data->title : "");
-    // gtk_entry_set_text(artist_entry, cb_data->artist ? cb_data->artist : "");
-    // gtk_entry_set_text(uid_entry, cb_data->uid ? cb_data->uid : "");
+    return NULL;
 }
 
 
+void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
+    GtkWidget *window = (GtkWidget *)data;
+
+// ./yt-dlp --print "title: %(title)s\nid: %(id)s\nartist: %(uploader)s\nthumbnail: %(thumbnail)s" https://www.youtube.com/watch?v=bB3-CUMERIU
+
+    GtkWidget* youtube_link = fetch_grid_elements(window, "youtube_link_entry");
+    gchar command[256];
+    snprintf(command, sizeof(command), "./yt-dlp --print \"title: %(title)s\nid: %(id)s\nartist: %(uploader)s\nthumbnail: %(thumbnail)s\" %s", gtk_entry_get_text(GTK_ENTRY(youtube_link)));
+
+    gchar* command1 = show_message_box(gtk_widget_get_toplevel(widget), command);
+
+    GtkWidget* song_entry = fetch_grid_elements(window, "song_entry");
+    GtkWidget* artist_entry = fetch_grid_elements(window,  "artist_entry");
+    GtkWidget* uid_entry = fetch_grid_elements(window, "uid_entry");
+
+    GRegex *regex;
+GMatchInfo *match_info;
+gchar *title = NULL, *id = NULL, *artist = NULL;
+
+regex = g_regex_new("title: ([^\n]+)\nid: ([^\n]+)\nartist: ([^\n]+)", 0, 0, NULL);
+g_regex_match(regex, command1, 0, &match_info);
+
+if (g_match_info_matches(match_info)) {
+    title = g_match_info_fetch(match_info, 1);
+    id = g_match_info_fetch(match_info, 2);
+    artist = g_match_info_fetch(match_info, 3);
+}
+
+g_match_info_free(match_info);
+g_regex_unref(regex);
+
+
+    gtk_entry_set_text(GTK_ENTRY(song_entry), title);
+    gtk_entry_set_text(GTK_ENTRY(artist_entry), artist);
+    gtk_entry_set_text(GTK_ENTRY(uid_entry), id);
+}
+
+// Correct
 static void activate(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
     GtkWidget *grid;
@@ -270,8 +282,9 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     youtube_link_label = gtk_label_new("YouTube");
     youtube_link_entry = gtk_entry_new();
+    gtk_widget_set_name(youtube_link_entry, "youtube_link_entry"); 
     parse_button = gtk_button_new_with_label("Parse");
-
+    
 
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("sample.jpg", NULL);
     GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, 300, 200, GDK_INTERP_BILINEAR);
@@ -281,15 +294,18 @@ static void activate(GtkApplication *app, gpointer user_data) {
 
     song_label = gtk_label_new("Song");
     song_entry = gtk_entry_new();
+    gtk_widget_set_name(song_entry, "song_entry"); 
 
     artist_label = gtk_label_new("Artist");
     artist_entry = gtk_entry_new();
+    gtk_widget_set_name(artist_entry, "artist_entry"); 
 
     id16_label = gtk_label_new("ID16");
     id16_entry = gtk_entry_new();
 
     uid_label = gtk_label_new("UID");
     uid_entry = gtk_entry_new();
+    gtk_widget_set_name(uid_entry, "uid_entry"); 
 
     ok_button = gtk_button_new_with_label("OK");
     cancel_button = gtk_button_new_with_label("Cancel");
