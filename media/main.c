@@ -2,18 +2,23 @@
 #include <mongoc/mongoc.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdio.h> 
 #include <sys/stat.h>
+
+// Implement CLI 
+// Memory Not Efficient
+// Widget Call In Single Iteration
+// Improve Element Positions
 
 mongoc_client_t *client;
 gchar *url = NULL, *title = NULL, *id = NULL, *artist = NULL, *thumbnail = NULL, *video_ext = NULL, *video_codec = NULL, *audio_codec = NULL, *video_format = NULL, *duration = NULL;
 
 void on_ok_button_clicked(GtkWidget *widget, gpointer data);
-void create_dynamic_short_video(const char *input_file, int num_segments, int segment_duration, int total_duration);
-
 void on_parse_button_clicked(GtkWidget *widget, gpointer data);
 GString* run_command(const char *command, GtkWidget *widget);
 int database_handle(gchar* database_name, gchar* collection_name, bson_t *doc);
+void update_log_text(GtkWidget *text_view, const gchar *new_log);
+GtkWidget* create_log_dialog(GtkWidget *parent);
+bool check_if_document_exists(const char *database_name, const char *collection_name, const char *id_str);
 void show_message_box(GtkWidget *parent, const gchar *command);
 GtkWidget* fetch_grid_elements(GtkWidget *widget, gpointer data);
 static void activate(GtkApplication *app, gpointer user_data);
@@ -48,9 +53,29 @@ int main(int argc, char **argv) {
     return status;
 }
 
-
+// Correct
 void on_ok_button_clicked(GtkWidget *widget, gpointer data) {
-    if (url == NULL && title == NULL && id == NULL && artist == NULL && thumbnail == NULL && duration == NULL) { fprintf(stderr, "Error: Bad format\n"); exit(EXIT_FAILURE); }
+    if (url == NULL && title == NULL && id == NULL && artist == NULL && thumbnail == NULL && duration == NULL) {
+        show_message_box(gtk_widget_get_toplevel(widget), "Check The Values");
+        exit(EXIT_FAILURE);
+    }
+
+    if(check_if_document_exists("media_server", "media_info", id)) {
+        show_message_box(gtk_widget_get_toplevel(widget), "Entry Exists");
+        exit(EXIT_FAILURE);
+    }
+
+    GtkWidget *window = (GtkWidget *)data;
+    GtkWidget* song_entry = fetch_grid_elements(window, "song_entry");
+    GtkWidget* artist_entry = fetch_grid_elements(window,  "artist_entry");
+    // Fetch All Widgets At Once
+
+    title = gtk_entry_get_text(GTK_ENTRY(song_entry));
+    artist = gtk_entry_get_text(GTK_ENTRY(artist_entry));
+
+    GtkWidget *text_view = create_log_dialog(window);
+
+    update_log_text(text_view, "Operations Started...\n");
 
     const char *video_path = g_strdup_printf("./video/%s.mp4",id); 
     const char *audio_path = g_strdup_printf("./audio/%s.m4a",id);
@@ -59,14 +84,20 @@ void on_ok_button_clicked(GtkWidget *widget, gpointer data) {
     snprintf(command, sizeof(command), "./yt-dlp -f 'bestvideo[ext=mp4]' -o '%s' --no-progress %s", video_path, url);
     GString *result = run_command(command, widget);
     if (result == NULL) {
-        // Throw
+        show_message_box(gtk_widget_get_toplevel(widget), "Video Download Failed");
+        exit(EXIT_FAILURE);
+    } else {
+        update_log_text(text_view, "Video Download Complete\n");
     }
 
     gchar command1[512];
     snprintf(command1, sizeof(command1), "./yt-dlp -f 'bestaudio[ext=m4a]' -o '%s' --no-progress %s", audio_path, url);
     GString *result1 = run_command(command1, widget);
     if (result1 == NULL) {
-        // Throw
+        show_message_box(gtk_widget_get_toplevel(widget), "Audio Download Failed");
+        exit(EXIT_FAILURE);
+    } else {
+        update_log_text(text_view, "Audio Download Complete\n");
     }
 
     bson_t *doc;
@@ -90,8 +121,11 @@ void on_ok_button_clicked(GtkWidget *widget, gpointer data) {
     BSON_APPEND_UTF8(doc, "Format", video_format);
 
     if (!database_handle("media_server", "media_info", doc)) {
-        g_print("Upload Successful");
-    } else g_error("An error occurred: %s", "Description of the error");
+        update_log_text(text_view, "Media Info Updated\n");
+    } else {
+        show_message_box(gtk_widget_get_toplevel(widget), "media_info Upload Failed");
+        exit(EXIT_FAILURE);
+    }
 
     doc = bson_new();
     BSON_APPEND_UTF8(doc, "_id", id);
@@ -101,63 +135,17 @@ void on_ok_button_clicked(GtkWidget *widget, gpointer data) {
     BSON_APPEND_UTF8(doc, "duration", duration); 
 
     if (!database_handle("media_server", "media_metadata", doc)) {
-        g_print("Upload Successful");
-    } else g_error("An error occurred: %s", "Description of the error");
-    
-    // const char *input_file = "input.mp4";
-    // int num_segments = 3;
-    // int segment_duration = 5;  // in seconds
-    // int total_duration = 180;  // in seconds, assuming the input video is 3 minutes long
+        update_log_text(text_view, "Media Metadata Updated\n");
+    } else {
+        show_message_box(gtk_widget_get_toplevel(widget), "media_metadata Upload Failed");
+        exit(EXIT_FAILURE);
+    }
 
-    // create_dynamic_short_video(input_file, num_segments, segment_duration, total_duration);
+    update_log_text(text_view, "Press OK To Continue\n");
+    gtk_dialog_run(GTK_DIALOG(gtk_widget_get_toplevel(text_view)));
+    gtk_widget_destroy(gtk_widget_get_toplevel(text_view));
+    show_message_box(gtk_widget_get_toplevel(widget), "Successful");
 }
-
-
-void create_dynamic_short_video(const char *input_file, int num_segments, int segment_duration, int total_duration) {
-    // Initialize random seed
-    srand(time(NULL));
-
-    // Calculate the maximum start time for each segment
-    int max_start_time = total_duration - (num_segments * segment_duration);
-
-    // Generate random start times for each segment
-    int *start_times = (int *)malloc(num_segments * sizeof(int));
-    for (int i = 0; i < num_segments; ++i) {
-        start_times[i] = rand() % max_start_time;
-    }
-
-    // Create FFmpeg commands to extract segments
-    char command[1024];
-    for (int i = 0; i < num_segments; ++i) {
-        snprintf(command, sizeof(command), "ffmpeg -i %s -ss %02d:%02d:%02d -t %02d:%02d:%02d -c copy segment%d.mp4",
-                 input_file, start_times[i] / 3600, (start_times[i] % 3600) / 60, start_times[i] % 60,
-                 segment_duration / 3600, (segment_duration % 3600) / 60, segment_duration % 60, i + 1);
-        system(command);
-    }
-
-    // Create a text file listing the segments
-    const char *filename = ".segments.txt";
-    FILE *segments_file = fopen(filename, "w");
-    if (!segments_file) {
-        perror("Failed to open segments.txt");
-        free(start_times);
-        return;
-    }
-    for (int i = 0; i < num_segments; ++i) {
-        fprintf(segments_file, "file 'segment%d.mp4'\n", i + 1);
-    }
-    fclose(segments_file);
-
-    // Concatenate the segments
-    snprintf(command, sizeof(command), "ffmpeg -f concat -safe 0 -i %s -c copy %s", filename, strcat(input_file, "/.loop/"));
-    system(command);
-
-    if (remove(filename) == 0) { printf("File deleted successfully.\n"); } else { perror("Error deleting file"); } 
-
-    // Clean up
-    free(start_times);
-}
-
 
 // Correct
 void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
@@ -182,7 +170,8 @@ void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
 
     GString *result = run_command(command, widget);
     if (result == NULL) {
-        // Throw
+        show_message_box(gtk_widget_get_toplevel(widget), "Print Didn't Worked");
+        exit(EXIT_FAILURE);
     }
 
     show_message_box(gtk_widget_get_toplevel(widget), result->str);
@@ -213,12 +202,30 @@ void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
     g_match_info_free(match_info);
     g_regex_unref(regex);
 
+    const char* dot = strrchr(thumbnail, '.');
+
     gchar commandC[512];
-    snprintf(commandC, sizeof(commandC), "curl -s -o ./.thumbnails/%s.jpg %s", id, thumbnail);
+    snprintf(commandC, sizeof(commandC), "curl -s -o ./.thumbnails/%s%s %s", id, dot, thumbnail);
 
     GString *result1 = run_command(commandC, widget);
     if (result1 == NULL) {
-        // Throw
+        show_message_box(gtk_widget_get_toplevel(widget), "Thumbnail Download Unsucessful");
+        exit(EXIT_FAILURE);
+    }
+
+    
+    if(strcmp(dot,".jpg")!= 0) {
+        gchar commandV[512];
+        snprintf(commandV, sizeof(commandV), "convert ./.thumbnails/%s%s ./.thumbnails/%s.jpg", id, dot, id);
+        GString *result2 = run_command(commandV, widget);
+        if (result2 == NULL) {
+            show_message_box(gtk_widget_get_toplevel(widget), "Thumbnail Did Not Convert");
+            exit(EXIT_FAILURE);
+        } else {
+            if (remove(g_strdup_printf("./.thumbnails/%s%s", id, dot)) != 0) {
+                show_message_box(gtk_widget_get_toplevel(widget), "Thumbnail Delete Failed, Do It Manually");
+            }
+        }
     }
 
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(g_strdup_printf("./.thumbnails/%s.jpg", id), NULL);
@@ -255,14 +262,13 @@ int database_handle(gchar* database_name, gchar* collection_name, bson_t *doc) {
 
     collection = mongoc_client_get_collection(client, database_name, collection_name);
 
-    // Insert the document into the collection
     if (!mongoc_collection_insert_one(collection, doc, NULL, NULL, &error)) {
-        fprintf(stderr, "Insert failed: %s\n", error.message);
+        show_message_box(NULL, "Mongo Insertion Failed");
         bson_destroy(doc);
         mongoc_collection_destroy(collection);
         mongoc_client_destroy(client);
         mongoc_cleanup();
-        return EXIT_FAILURE;
+        exit(EXIT_FAILURE);
     }
 
     bson_destroy(doc);
@@ -272,8 +278,24 @@ int database_handle(gchar* database_name, gchar* collection_name, bson_t *doc) {
 }
 
 // Correct
+bool check_if_document_exists(const char *database_name, const char *collection_name, const char *id_str) { 
+    mongoc_collection_t *collection = mongoc_client_get_collection(client, database_name, collection_name); 
+    bson_t *query = BCON_NEW("_id", BCON_UTF8(id_str)); 
+    mongoc_cursor_t *cursor = mongoc_collection_find_with_opts(collection, query, NULL, NULL); 
+    const bson_t *doc; 
+    bool exists = mongoc_cursor_next(cursor, &doc); 
+    bson_error_t error; 
+    if (mongoc_cursor_error(cursor, &error)) { 
+        fprintf(stderr, "Cursor Error: %s\n", error.message); 
+    } 
+    mongoc_cursor_destroy(cursor); 
+    bson_destroy(query); 
+    mongoc_collection_destroy(collection); 
+    return exists;
+} 
+
+// Correct
 void show_message_box(GtkWidget *parent, const gchar *command) {
-    
     GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(parent),
                                                GTK_DIALOG_DESTROY_WITH_PARENT,
                                                GTK_MESSAGE_INFO,
@@ -282,6 +304,38 @@ void show_message_box(GtkWidget *parent, const gchar *command) {
 
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
+}
+
+// Correct
+GtkWidget* create_log_dialog(GtkWidget *parent) {
+    GtkWidget *dialog = gtk_dialog_new_with_buttons("Logs",
+                                                    GTK_WINDOW(parent),
+                                                    GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                    "_OK",
+                                                    GTK_RESPONSE_OK,
+                                                    NULL);
+    
+    GtkWidget *content_area = gtk_dialog_get_content_area(GTK_DIALOG(dialog));
+    GtkWidget *scrolled_window = gtk_scrolled_window_new(NULL, NULL);
+    GtkWidget *text_view = gtk_text_view_new();
+
+    gtk_container_add(GTK_CONTAINER(scrolled_window), text_view);
+    gtk_container_add(GTK_CONTAINER(content_area), scrolled_window);
+
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(text_view), FALSE);
+    gtk_widget_set_size_request(scrolled_window, 400, 300);
+    gtk_widget_show_all(dialog);
+
+    return text_view;  // Return the text view for updating logs
+}
+
+// Correct
+void update_log_text(GtkWidget *text_view, const gchar *new_log) {
+    GtkTextBuffer *buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_view));
+    GtkTextIter end;
+    gtk_text_buffer_get_end_iter(buffer, &end);
+    gtk_text_buffer_insert(buffer, &end, new_log, -1);
+    while (gtk_events_pending()) gtk_main_iteration();
 }
 
 // Correct
@@ -344,7 +398,7 @@ static void activate(GtkApplication *app, gpointer user_data) {
     parse_button = gtk_button_new_with_label("Parse");
     
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("sample.jpg", NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file("./.thumbnails/sample.jpg", NULL);
     GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, 400, 250, GDK_INTERP_BILINEAR);
     image_box = gtk_image_new_from_pixbuf(scaled_pixbuf);
     gtk_widget_set_name(image_box, "image_box"); 
@@ -361,6 +415,8 @@ static void activate(GtkApplication *app, gpointer user_data) {
     uid_label = gtk_label_new("UID");
     uid_entry = gtk_entry_new();
     gtk_widget_set_name(uid_entry, "uid_entry"); 
+    gtk_editable_set_editable(GTK_EDITABLE(uid_entry), FALSE); 
+    gtk_widget_set_sensitive(uid_entry, FALSE);
 
     ok_button = gtk_button_new_with_label("OK");
     cancel_button = gtk_button_new_with_label("Cancel");
@@ -387,9 +443,6 @@ gtk_grid_attach(GTK_GRID(grid), song_entry, 1, 2, 4, 1);
 
 gtk_grid_attach(GTK_GRID(grid), artist_label, 0, 3, 1, 1);
 gtk_grid_attach(GTK_GRID(grid), artist_entry, 1, 3, 4, 1);
-
-// gtk_grid_attach(GTK_GRID(grid), id16_label, 0, 4, 1, 1);
-// gtk_grid_attach(GTK_GRID(grid), id16_entry, 1, 4, 4, 1);
 
 gtk_grid_attach(GTK_GRID(grid), uid_label, 0, 5, 1, 1);
 gtk_grid_attach(GTK_GRID(grid), uid_entry, 1, 5, 4, 1);
