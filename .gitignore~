@@ -45,4 +45,4 @@ mongo-c-driver-1.22.0/
 .thumbnails/
 media/
 .loop/
-*.log
+
