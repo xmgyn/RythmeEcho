@@ -1,7 +1,6 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
-import { useRef } from 'solid-js/web';
-import Controller from './../components/controller';
-import PingComponent from './../components/ping';
+import Controller from './../components/Controller';
+import PingComponent from './../components/Ping';
 
 const Play = () => {
   let videoRef;

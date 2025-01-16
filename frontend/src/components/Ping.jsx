@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { createSignal, createEffect, onCleanup } from 'solid-js';
 
 const PingComponent = () => {
-  const [status, setStatus] = useState('Status: Disconnected');
-  const [pingTime, setPingTime] = useState(null);
+  const [status, setStatus] = createSignal('Status: Disconnected');
+  const [pingTime, setPingTime] = createSignal(null);
 
   const pingServer = async () => {
     const start = Date.now();
@@ -24,16 +24,16 @@ const PingComponent = () => {
     }
   };
 
-  useEffect(() => {
-    const intervalId = setInterval(pingServer, 1000); 
-    return () => clearInterval(intervalId);
-  }, []);
+  createEffect(() => {
+    const intervalId = setInterval(pingServer, 1000);
+    onCleanup(() => clearInterval(intervalId));
+  });
 
   return (
     <div>
-        <div class="notiglow"></div>
-        <div class="notiborderglow"></div>
-        <div class="notititle">{status} {pingTime !== null && `time: ${pingTime}ms`}</div>\
+      <div class="notiglow"></div>
+      <div class="notiborderglow"></div>
+      <div class="notititle">{status()} {pingTime() !== null && `time: ${pingTime()}ms`}</div>
     </div>
   );
 };
