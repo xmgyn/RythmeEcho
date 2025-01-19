@@ -1,2 +1,0 @@
-/home/mgyn/Work/RythmeEcho/media/mongo-c-driver-1.22.0/cmake-build/CMakeFiles/CheckCXX/CMakeFiles/edit_cache.dir
-/home/mgyn/Work/RythmeEcho/media/mongo-c-driver-1.22.0/cmake-build/CMakeFiles/CheckCXX/CMakeFiles/rebuild_cache.dir

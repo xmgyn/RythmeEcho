@@ -1,1 +1,0 @@
-/usr/bin/cc -O2 -g -DNDEBUG -rdynamic "CMakeFiles/mongoc-stat.dir/__/tools/mongoc-stat.c.o" -o mongoc-stat  -Wl,-rpath,/home/mgyn/Work/RythmeEcho/media/mongo-c-driver-1.22.0/cmake-build/src/libmongoc:/home/mgyn/Work/RythmeEcho/media/mongo-c-driver-1.22.0/cmake-build/src/libbson libmongoc-1.0.so.0.0.0 -lssl -lcrypto -lrt -lresolv -lz -lzstd -licuuc ../libbson/libbson-1.0.so.0.0.0
