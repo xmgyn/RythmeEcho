@@ -1,1 +1,148 @@
-body{height:100vh;width:100vw;overflow:hidden}div#root{position:absolute;height:100vh;width:100vw}div._Player_i57ri_1{position:fixed;top:0;left:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;margin:0;background-color:#000;z-index:1}div._Controller_h9fow_1{position:absolute;background:#0c0303;color:#fff;width:17vw;height:80vh;margin:10vh;z-index:2;border-radius:20px;right:0;div{border-bottom:10px solid white}svg{width:40px;height:40px}}
+:root {
+	--hue: 223;
+	--bg: hsl(var(--hue),90%,95%);
+	--fg: hsl(var(--hue),90%,5%);
+	--trans-dur: 0.3s;
+}
+
+body{
+    height:100vh;
+    width:100vw;
+    overflow:hidden
+}
+
+div#root{
+    position:absolute;
+    height:100vh;
+    width:100vw
+}
+
+div.loader {
+    display: block;
+    position: absolute;
+    background: #00000008;
+    border-radius: 50px;
+}
+
+main {
+	padding: 1.5em 0;
+}
+.ip {
+	width: 16em;
+	height: 8em;
+}
+.ip__track {
+	stroke: hsl(var(--hue),90%,90%);
+	transition: stroke var(--trans-dur);
+}
+.ip__worm1,
+.ip__worm2 {
+	animation: worm1 2s linear infinite;
+}
+.ip__worm2 {
+	animation-name: worm2;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: hsl(var(--hue),90%,5%);
+		--fg: hsl(var(--hue),90%,95%);
+	}
+	.ip__track {
+		stroke: hsl(var(--hue),90%,15%);
+	}
+}
+
+/* Animation */
+@keyframes worm1 {
+	from {
+		stroke-dashoffset: 0;
+	}
+	50% {
+		animation-timing-function: steps(1);
+		stroke-dashoffset: -358;
+	}
+	50.01% {
+		animation-timing-function: linear;
+		stroke-dashoffset: 358;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+@keyframes worm2 {
+	from {
+		stroke-dashoffset: 358;
+	}
+	50% {
+		stroke-dashoffset: 0;
+	}
+	to {
+		stroke-dashoffset: -358;
+	}
+}
+
+div.Player{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0;
+    background-color:#000;
+    z-index:1
+}
+
+div.Controller{
+    position:absolute;
+    background:#232323;
+    color:#fff;
+    width:20vw;
+    height:80vh;
+    margin:10vh;
+    z-index:2;
+    border-radius:20px;
+    right:0;
+
+    div.current {
+        height: 20%;
+    }
+
+    div.queue {
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+    scrollbar-width: none;
+    scrollbar-color: black grey;
+    height: 80%;
+    }
+    
+    .block.active {
+        background: #000000a8;
+    }
+
+    div.block {
+        width: auto;
+        border: 4px solid #00000047;
+        border-radius: 10px;
+        margin: 10px;
+        min-height: 4em;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        
+        
+        .title {
+            font-size: medium;
+            padding: 6px 14px 5px;
+        }
+        .artist {
+            font-size: small;
+            padding-bottom: 6px;
+        }
+    }
+}
