@@ -11,7 +11,7 @@
     <video id="videoPlayer" controls width="640" height="360"></video>
     <script>
     var videoId = 'nntGTK2Fhb0'; 
-    fetch(`http://192.168.0.102:4000/play?id=${videoId}`)
+    fetch(`http://rythmebox.mrigyn.shop/play?id=${videoId}`)
         .then(response => function () { 
             if (response.status === 200) { 
                 return response.json(); 
@@ -20,7 +20,7 @@
         }})
         .then(data => {
             var player = dashjs.MediaPlayer().create();
-            player.initialize(document.querySelector("#videoPlayer"), "http://192.168.0.102:4000/play/manifest.mpd", true);}
+            player.initialize(document.querySelector("#videoPlayer"), "http://rythmebox.mrigyn.shop/play/manifest.mpd", true);}
         )
         .catch(error => console.error('Error:', error));
     </script>
