@@ -1,148 +1,91 @@
-:root {
-	--hue: 223;
-	--bg: hsl(var(--hue),90%,95%);
-	--fg: hsl(var(--hue),90%,5%);
-	--trans-dur: 0.3s;
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden
 }
-
-body{
-    height:100vh;
-    width:100vw;
-    overflow:hidden
+div#root {
+    position: absolute;
+    height: 100vh;
+    width: 100vw
 }
-
-div#root{
-    position:absolute;
-    height:100vh;
-    width:100vw
-}
-
 div.loader {
     display: block;
     position: absolute;
     background: #00000008;
     border-radius: 50px;
 }
-
-main {
-	padding: 1.5em 0;
+div.Player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    background-color: #000;
+    z-index: 1
 }
-.ip {
-	width: 16em;
-	height: 8em;
+div.Controller {
+	display: none;
+    position: absolute;
+    background: #232323;
+    color: #fff;
+    height: 100vh;
+    z-index: 2;
+    border-radius: 20px 0px 0px 20px;
+    right: 0;
 }
-.ip__track {
-	stroke: hsl(var(--hue),90%,90%);
-	transition: stroke var(--trans-dur);
+div.queue {
+    overflow-y: scroll;
+    height: 100%;
 }
-.ip__worm1,
-.ip__worm2 {
-	animation: worm1 2s linear infinite;
+.block.active {
+    background: #03a2ff;
 }
-.ip__worm2 {
-	animation-name: worm2;
+.block.select {
+    background: #08a4ff70;
 }
-
-/* Dark theme */
-@media (prefers-color-scheme: dark) {
-	:root {
-		--bg: hsl(var(--hue),90%,5%);
-		--fg: hsl(var(--hue),90%,95%);
-	}
-	.ip__track {
-		stroke: hsl(var(--hue),90%,15%);
-	}
+div.block {
+    width: 34vw;
+    border: 4px solid #03a2ff;
+    border-radius: 18px;
+    margin: 30px 36px;
+    min-height: 8em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
 }
-
-/* Animation */
-@keyframes worm1 {
-	from {
-		stroke-dashoffset: 0;
-	}
-	50% {
-		animation-timing-function: steps(1);
-		stroke-dashoffset: -358;
-	}
-	50.01% {
-		animation-timing-function: linear;
-		stroke-dashoffset: 358;
-	}
-	to {
-		stroke-dashoffset: 0;
-	}
+.title {
+    font-size: xx-large;
+    padding: 25px 30px 18px;
 }
-@keyframes worm2 {
-	from {
-		stroke-dashoffset: 358;
-	}
-	50% {
-		stroke-dashoffset: 0;
-	}
-	to {
-		stroke-dashoffset: -358;
-	}
+.artist {
+    font-size: x-large;
+    padding-bottom: 25px;
 }
 
-div.Player{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100vw;
-    height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin:0;
-    background-color:#000;
-    z-index:1
+.Error {
+	position: absolute;
+    height: 70vh;
+    margin: 15vh 17vw;
+    width: 66vw;
+    z-index: 1;
+    border-radius: 25px;
+    background: #000000;
+    display: none;
+    justify-content: center;
 }
 
-div.Controller{
-    position:absolute;
-    background:#232323;
-    color:#fff;
-    width:20vw;
-    height:80vh;
-    margin:10vh;
-    z-index:2;
-    border-radius:20px;
-    right:0;
-
-    div.current {
-        height: 20%;
-    }
-
-    div.queue {
-        overflow-y: scroll;
-        scroll-behavior: smooth;
-    scrollbar-width: none;
-    scrollbar-color: black grey;
-    height: 80%;
-    }
-    
-    .block.active {
-        background: #000000a8;
-    }
-
-    div.block {
-        width: auto;
-        border: 4px solid #00000047;
-        border-radius: 10px;
-        margin: 10px;
-        min-height: 4em;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-        
-        
-        .title {
-            font-size: medium;
-            padding: 6px 14px 5px;
-        }
-        .artist {
-            font-size: small;
-            padding-bottom: 6px;
-        }
-    }
+#message {
+	height: 50%;
+    width: 80%;
+    position: absolute;
+    color: white;
+    font-size: 5em;
+    text-align: center;
+    bottom: 60px;
+    overflow: hidden;
 }
