@@ -55,10 +55,9 @@ function handleKeydown(event) {
             });
             break;
         case 13: // Enter
-            controller.style.display = 'block';
-            controllerIsLive = true;
             if (controllerIsLive) {
                 setVideo(data[currentSelect % max]);
+                current = currentSelect;
             } else {
                 if (videoRef.paused) {
                     videoRef.play();
@@ -99,8 +98,14 @@ function markActive(title) {
     queueitems.forEach(element => {
         if (element.textContent.includes(title)) {
             element.classList.add('active');
+            element.classList.add('select');
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
         } else {
             element.classList.remove('active');
+            element.classList.remove('select');
         }
     });
 }
