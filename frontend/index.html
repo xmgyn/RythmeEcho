@@ -9,10 +9,17 @@
 
 <body onkeydown="handleKeydown(event)">
     <div class="Player" id="player">
+    	<div class="status"></div>
         <div class="loader" id="loader">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="200" height="200" style="shape-rendering: auto; display: block; background: transparent;" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path style="transform:scale(0.8);transform-origin:50px 50px" stroke-linecap="round" d="M24.3 30C11.4 30 5 43.3 5 50s6.4 20 19.3 20c19.3 0 32.1-40 51.4-40 C88.6 30 95 43.3 95 50s-6.4 20-19.3 20C56.4 70 43.6 30 24.3 30z" stroke-dasharray="42.76482137044271 42.76482137044271" stroke-width="5" stroke="#03a2ff" fill="none">
-  <animate values="0;256.58892822265625" keyTimes="0;1" dur="1s" repeatCount="indefinite" attributeName="stroke-dashoffset"></animate>
-</path><g></g></g></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="200" height="200" style="shape-rendering: auto; display: block; background: transparent;" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g>
+                    <path style="transform:scale(0.8);transform-origin:50px 50px" stroke-linecap="round" d="M24.3 30C11.4 30 5 43.3 5 50s6.4 20 19.3 20c19.3 0 32.1-40 51.4-40 C88.6 30 95 43.3 95 50s-6.4 20-19.3 20C56.4 70 43.6 30 24.3 30z" stroke-dasharray="42.76482137044271 42.76482137044271"
+                    stroke-width="5" stroke="#f91eb4" fill="none">
+                        <animate values="0;256.58892822265625" keyTimes="0;1" dur="1s" repeatCount="indefinite" attributeName="stroke-dashoffset"></animate>
+                    </path>
+                    <g></g>
+                </g>
+            </svg>
 
 
         </div>
@@ -25,13 +32,25 @@
         </video>
     </div>
     <div class="Error" id="Error">
-    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="
+
     width: 20%;
+
     height: 35%;
+
     position: absolute;
+
     margin: 40px 0px;
-"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect> <path fill-rule="evenodd" clip-rule="evenodd" d="M6 11L11 6L24 19L37 6L42 11L29 24L42 37L37 42L24 29L11 42L6 37L19 24L6 11Z" fill="#2F88FF" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
-    <div id="message" ></div>
+
+">
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+            <g id="SVGRepo_iconCarrier">
+                <rect width="48" height="48" fill="white" fill-opacity="0.01"></rect>
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M6 11L11 6L24 19L37 6L42 11L29 24L42 37L37 42L24 29L11 42L6 37L19 24L6 11Z" fill="#f91eb4" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </svg>
+        <div id="message"></div>
     </div>
     <script async crossorigin src="./assets/dash.all.min.js"></script>
     <script crossorigin src="./assets/index.js"></script>
