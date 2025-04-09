@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" version="1.0.0" viewmodes="maximized">
-    <tizen:application id="MXOPJx6JXU.RythmeEcho" package="MXOPJx6JXU" required_version="2.3"/>
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" version="1.0.0" viewmodes="maximized">
+    <tizen:application id="5f7SE5vOwL.RythmeEcho" package="5f7SE5vOwL" required_version="2.3"/>
     <content src="index.html"/>
-    <tizen:content-security-policy>default-src 'self'; connect-src 'self' http://rythmebox.mrigyn.shop/; style-src 'self' 'unsafe-inline'; media-src 'self' http://rythmebox.mrigyn.shop blob:; script-src 'self' 'unsafe-inline';</tizen:content-security-policy>
+    <tizen:content-security-policy>default-src 'self'; connect-src 'self' http://192.168.0.110:4879/; style-src 'self' 'unsafe-inline'; media-src 'self' http://192.168.0.110:4879 blob:; script-src 'self' 'unsafe-inline';</tizen:content-security-policy>
     <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
     <icon src="logo.png"/>
     <tizen:metadata key="http://tizen.org/metadata/app_ui_type/base_screen_resolution" value="extensive"/>
     <name>RythmeEcho</name>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
     <tizen:profile name="tv-samsung"/>
     <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
 </widget>

@@ -14,6 +14,13 @@ const controller = document.querySelector('.controller');
 const error = document.getElementById('Error');
 
 function handleKeydown(event) {
+	let debounceTimeout;
+	let debounceDelay = 500; 
+
+	function debounceEvent(callback, delay) {
+	    clearTimeout(debounceTimeout);
+	    debounceTimeout = setTimeout(callback, delay);
+	}
 
     let currentSelect = Array.from(queueitems).findIndex(item => item.classList.contains('select'));
 
@@ -22,11 +29,13 @@ function handleKeydown(event) {
 
     var command;
     switch (event.keyCode) {
-        case 37: // ArrowLeft
-            if (current > 0) setVideo(data[(--current) % max])
+        case 427: // ChannelUp
+        	++current;
+        	debounceEvent(() => setVideo(data[(current) % max]), debounceDelay);
             break;
-        case 39: // ArrowRight
-            setVideo(data[(++current) % max])
+        case 428: // ChannelDown
+            if (current > 0) --current
+            debounceEvent(() => setVideo(data[(current) % max]), debounceDelay);
             break;
         case 40: // ArrowDown
         	controller.style.display = 'block';
@@ -48,6 +57,23 @@ function handleKeydown(event) {
             if (currentSelect > 0) {
                 queueitems[currentSelect].classList.remove('select');
                 queueitems[--currentSelect].classList.add('select');
+            }
+            queueitems[currentSelect].scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+            break;
+        case 39: // ArrowRight
+        	videoRef.currentTime += 10;
+        	break;
+        case 37: // ArrowLeft
+        	videoRef.currentTime -= 10
+        	break;
+        case 458: // ChannelList
+        	controller.style.display = 'block';
+            controllerIsLive = true;
+            if (currentSelect === -1) {
+                queueitems[0].classList.add('select');
             }
             queueitems[currentSelect].scrollIntoView({
                 behavior: 'smooth',
@@ -135,10 +161,10 @@ function setController(element) {
 }
 
 function setVideo(video) {
-    fetch(`http://rythmebox.mrigyn.shop/play?id=${video["_id"]}`)
+    fetch(`http://192.168.0.110:4879/play?id=${video["_id"]}`)
         .then(response => {
             if (response.status === 200) {
-                player.initialize(videoRef, `http://rythmebox.mrigyn.shop/play/manifest.mpd`, true);
+                player.initialize(videoRef, 'http://192.168.0.110:4879/play/manifest.mpd', true);
                 markActive(video["song_title"]);
             } else {
                 throw new Error('Video not found');
@@ -150,8 +176,9 @@ function setVideo(video) {
 };
 
 document.addEventListener('DOMContentLoaded', async() => {
+	tizen.tvinputdevice.registerKeyBatch(['ChannelUp', 'ChannelDown', 'Guide' ]); 
     try {
-        const response = await fetch("http://rythmebox.mrigyn.shop/random");
+        const response = await fetch('http://192.168.0.110:4879/random');
         const result = await response.json();
         data = result;
         setController("queue");
@@ -166,6 +193,7 @@ document.addEventListener('DOMContentLoaded', async() => {
     videoRef.addEventListener('waiting', () => setLoading(true));
     videoRef.addEventListener('stalled', () => setLoading(true));
     videoRef.addEventListener('play', () => setLoading(false));
+    videoRef.addEventListener('seeked', () => setLoading(false));
     videoRef.addEventListener('pause', () => setLoading(false));
     videoRef.addEventListener('ended', () => setVideo(data[(++current) % max]));
     
