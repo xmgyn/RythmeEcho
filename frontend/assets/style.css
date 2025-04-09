@@ -23,9 +23,12 @@ div.Status {
     border-radius: 18px;
     width: 11vw;
     background: black;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
+}
+div.Status svg {
+    	height: 50%;
 }
 div.Player {
     position: fixed;
