@@ -1,5 +1,3 @@
-//const { findDocuments } = require('./../database.js');
-
 const { MongoClient } = require('mongodb');
 
 const url = 'mongodb://localhost:27020';
@@ -22,7 +20,7 @@ function shuffle(array) {
     }
   }
 
-async function insertDocument(database, collection, document) {
+async function fetchDocument(database, collection, document) {
     try {
         await client.connect();
         const database = client.db('media_server');  // Replace with your database name
@@ -30,9 +28,8 @@ async function insertDocument(database, collection, document) {
 
         // Fetch all documents
         const data = await collection.find({}).toArray();
-
-shuffle(data)
-        console.log('Randomized Data:', data);
+        shuffle(data)
+        return data;
     }
     catch (error) {
         console.error('Insert Error:', error);
@@ -41,6 +38,12 @@ shuffle(data)
     }
 }
 
-module.exports = function (req, res) {
-    insertDocument()
-}
+module.exports = async function (req, res) {
+    const dataArray = await fetchDocument(); 
+    const jsonData = JSON.stringify(dataArray);
+    const uint8Array = new TextEncoder().encode(jsonData);
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(uint8Array);
+};
+

@@ -7,11 +7,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-// Implement CLI 
-// Memory Not Efficient
-// Widget Call In Single Iteration
-// Improve Element Positions
-
 mongoc_client_t *client;
 gchar *url = NULL, *title = NULL, *id = NULL, *artist = NULL, *thumbnail = NULL, *video_ext = NULL, *video_codec = NULL, *audio_codec = NULL, *video_format = NULL, *duration = NULL;
 
@@ -44,7 +39,7 @@ int main(int argc, char **argv) {
 
     mongoc_init();
     
-    client = mongoc_client_new("mongodb://localhost:27017/");
+    client = mongoc_client_new("mongodb://localhost:27020/");
     if (!client) {
         fprintf(stderr, "Failed to parse URI.\n");
         return EXIT_FAILURE;
@@ -87,8 +82,8 @@ void on_ok_button_clicked(GtkWidget *widget, gpointer data) {
 
     update_log_text(text_view, "Operations Started...\n");
 
-    const char *video_path = g_strdup_printf("./media/%s.mp4",id); 
-    const char *audio_path = g_strdup_printf("./media/%s.m4a",id);
+    const char *video_path = g_strdup_printf("./../Videos/%s.mp4",id); 
+    const char *audio_path = g_strdup_printf("./../Videos/%s.m4a",id);
 
     gchar command[512];
     snprintf(command, sizeof(command), "./yt-dlp -f 'bestvideo[ext=mp4]' -o '%s' --no-progress %s", video_path, url);
@@ -220,7 +215,7 @@ void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
     const char* dot = strrchr(thumbnail, '.');
 
     gchar commandC[512];
-    snprintf(commandC, sizeof(commandC), "curl -s -o ./.thumbnails/%s%s %s", id, dot, thumbnail);
+    snprintf(commandC, sizeof(commandC), "curl -s -o ./../Thumbnails/%s%s %s", id, dot, thumbnail);
 
     GString *result1 = run_command(commandC, widget);
     if (result1 == NULL) {
@@ -231,7 +226,7 @@ void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
     
     if(strcmp(dot,".jpg")!= 0) {
         gchar commandV[512];
-        snprintf(commandV, sizeof(commandV), "convert ./.thumbnails/%s%s ./.thumbnails/%s.jpg", id, dot, id);
+        snprintf(commandV, sizeof(commandV), "convert ./../Thumbnails/%s%s ./../Thumbnails/%s.jpg", id, dot, id);
         GString *result2 = run_command(commandV, widget);
         if (result2 == NULL) {
             show_message_box(gtk_widget_get_toplevel(widget), "Thumbnail Did Not Convert");
@@ -243,7 +238,7 @@ void on_parse_button_clicked(GtkWidget *widget, gpointer data) {
         }
     }
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(g_strdup_printf("./.thumbnails/%s.jpg", id), NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(g_strdup_printf("./../Thumbnails/%s.jpg", id), NULL);
     GdkPixbuf *scaled_pixbuf = gdk_pixbuf_scale_simple(pixbuf, 400, 250, GDK_INTERP_BILINEAR);
     gtk_image_set_from_pixbuf(GTK_IMAGE(image_box), scaled_pixbuf);
 

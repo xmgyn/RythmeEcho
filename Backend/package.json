@@ -1,6 +1,6 @@
 {
   "script": {
-    "start": "nodemon server.js"
+    "start": "pm2 start server.js --name RythmeEcho"
   },
   "dependencies": {
     "mongodb": "^6.12.0",

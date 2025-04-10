@@ -1,4 +1,3 @@
-const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
@@ -6,8 +5,7 @@ var id;
 
 module.exports = function(req, res, query, MEDIA_DIR) {
     const url = req.url;
-    if (query.id) { // search if video is available
-        console.table(query);
+    if (query.id) { 
         id = query.id;
         res.writeHead(200);
         res.end();
