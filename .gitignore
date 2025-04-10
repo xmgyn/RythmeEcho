@@ -37,13 +37,5 @@ yarn-error.log*
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
 
-database/
-mongo-c-driver-1.22.0/
-.thumbnails/
-media/
-.loop/
 *.log

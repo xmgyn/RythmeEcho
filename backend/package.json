@@ -1,9 +1,0 @@
-{
-  "script": {
-    "start": "nodemon server.js"
-  },
-  "dependencies": {
-    "mongodb": "^6.12.0",
-    "nodemon": "^3.1.9"
-  }
-}
