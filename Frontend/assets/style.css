@@ -1,0 +1,105 @@
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden
+}
+div#root {
+    position: absolute;
+    height: 100vh;
+    width: 100vw
+}
+div.Loader {
+    display: block;
+    position: absolute;
+    background: #00000008;
+    border-radius: 50px;
+}
+div.Status {
+    position: absolute;
+    bottom: 5vh;
+    left: 5vw;
+    height: 10vh;
+    border: 4px solid #f91eb4;
+    border-radius: 18px;
+    width: 11vw;
+    background: black;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+div.Status svg {
+    	height: 50%;
+}
+div.Player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    background-color: #000;
+    z-index: 1
+}
+div.Controller {
+    display: none;
+    position: absolute;
+    background: #232323;
+    color: #fff;
+    height: 100vh;
+    z-index: 2;
+    border-radius: 20px 0px 0px 20px;
+    right: 0;
+}
+div.queue {
+    overflow-y: scroll;
+    height: 100%;
+}
+.block.active {
+    background: #f91eb4;
+}
+.block.select {
+    background: #a7227db5;
+}
+div.block {
+    width: 34vw;
+    border: 4px solid #ff4cc7;
+    border-radius: 18px;
+    margin: 30px 36px;
+    min-height: 8em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+.title {
+    font-size: xx-large;
+    padding: 25px 30px 18px;
+}
+.artist {
+    font-size: x-large;
+    padding-bottom: 25px;
+}
+.Error {
+    position: absolute;
+    height: 70vh;
+    margin: 15vh 17vw;
+    width: 66vw;
+    z-index: 1;
+    border-radius: 25px;
+    background: #000000;
+    display: none;
+    justify-content: center;
+}
+#message {
+    height: 50%;
+    width: 80%;
+    position: absolute;
+    color: white;
+    font-size: 5em;
+    text-align: center;
+    bottom: 60px;
+    overflow: hidden;
+}
