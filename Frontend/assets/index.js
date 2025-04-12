@@ -9,6 +9,8 @@ var player;
 var queueitems;
 var controllerIsLive = false;
 
+const SERVER_IP = 0; // Enter Your Server IP
+
 const videoRef = document.getElementById('videoPlayer');
 const loader = document.getElementById('loader');
 const queue = document.querySelector('.queue');
@@ -204,10 +206,10 @@ function setController(element) {
 }
 
 function setVideo(video) {
-    fetch(`http://192.168.0.110:4879/play?id=${video["_id"]}`)
+    fetch(`http://${SERVER_IP}:4879/play?id=${video["_id"]}`)
         .then(response => {
             if (response.status === 200) {
-                player.initialize(videoRef, 'http://192.168.0.110:4879/play/manifest.mpd', true);
+                player.initialize(videoRef, `http://${SERVER_IP}:4879/play/manifest.mpd`, true);
                 markActive(video["song_title"]);
             } else {
                 throw new Error('Video not found');
@@ -221,7 +223,7 @@ function setVideo(video) {
 document.addEventListener('DOMContentLoaded', async() => {
 	tizen.tvinputdevice.registerKeyBatch(['ChannelUp', 'ChannelDown', 'Guide' ]); 
     try {
-        const response = await fetch('http://192.168.0.110:4879/random');
+        const response = await fetch(`http://${SERVER_IP}:4879/random`);
         const result = await response.json();
         data = result;
         setController("queue");
