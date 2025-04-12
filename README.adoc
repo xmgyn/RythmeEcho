@@ -24,17 +24,23 @@ Completed
 |===
 |Name|Version
 
-|lib-mongo
-|5.1
+|mongo-c-driver
+|1.30.3
 
-|gtk
+|GTK
 |3.0
 
-|node-js
-|
+|Node.js
+|23.6.0
+
+|Tizen OS
+|6.0
 
 |Tizen Studio
 |6.0
+
+|Samsung TV Extension
+|tv-samsung-9.0
 |===
 
 '''
@@ -47,7 +53,7 @@ TIP: Walkthrough Videos Are Provided Inside Docs Folder
 [source, bash]
 sudo mongod --port 27020
 . Media Preparation
-.. Install The Mongo-C-Driver And GTK-3 User Interface Framework.
+.. Install The link:https://github.com/mongodb/mongo-c-driver[Mongo-C-Driver] And GTK-3 User Interface Framework.
 .. Open Terminal And Execute:
 [source, bash]
 make
@@ -66,7 +72,7 @@ npm i
 [source, bash]
 node server.js
 . Setup Tizen TV App
-.. Install Tizen Studios And Setup Certificate Using Your Samsung Account
+.. Install Tizen Studios, Install Samsung Extension And Setup Certificate Using Your Samsung Account
 .. Unlock Apps In TV By Pressing #12345# On Remote And Enter Computer IP Address
 .. Open Device Manager And Connect TV With Your Computer
 .. Setup A New Tizen Project And Place The Code Files In Tizen Project Folder
