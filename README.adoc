@@ -78,14 +78,15 @@ node server.js
 .. Setup A New Tizen Project And Place The Code Files In Tizen Project Folder
 .. Replace #SERVER_IP# With Actual Server IP In #config.xml# And #index.js#
 .. #Run As# Will Run The Code On TV
-.. If Unsure, Refer To A Brief Tutorial On Youtube
+.. If Unsure, Refer To A Brief Tutorial On Youtube. Walkthrough Video May Not Be Appropriate For Actual TV
 
 '''
 
 == Special Note
 
 . This Project Contains A Significant Amount Of Extra Code That Has Not Been Implemented Or Deemed Necessary
-. Edge Cases Have Not Been Addressed Properly, Which Might Cause The App To Crash Unexpectedly
+. Edge Cases Have Not Been Addressed Properly, Which Might Cause The App/Server To Crash Unexpectedly
+. Walkhthrough Video For TV Is Not Appropriate, Things May Differ In Real Environment
 
 '''
 
